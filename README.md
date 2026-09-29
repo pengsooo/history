@@ -11,11 +11,13 @@
 
 | 파일 | 내용 |
 |---|---|
-| `data/profile.yml` | 이름, 소개, 핵심 지표, 연락처 링크 |
+| `data/profile.yml` | 이름, 소개, 추가 핵심 지표, 연락처 링크 |
 | `data/career.yml` | 경력 (최신순, `end` 비우면 "현재") |
 | `data/certifications.yml` | 보유 자격증 |
-| `data/audits.yml` | 인증 수행 이력 (연도별 매트릭스로 표시) |
+| `data/audits.yml` | 인증 수행 이력 — `category`는 필수·의무·공공·금융·글로벌 중 하나 (영역별 색상 간트로 표시) |
 | `data/projects.yml` | 주요 프로젝트·성과 |
+
+사이드바의 경력 연수·수행 인증 종류·자격증 개수는 데이터에서 자동 계산됩니다.
 
 GitHub 웹에서 파일을 열고 ✏️(Edit) → 수정 → Commit 하면 `main` 브랜치 기준 약 1~2분 후 사이트에 반영됩니다.
 

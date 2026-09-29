@@ -1,34 +1,42 @@
-# 인증 수행 이력 — 고객사명·심사 결과는 넣지 말고 유형·건수 등 비식별 형태로 작성하세요.
-# category: 국내 | 국제 | 금융
+# 인증 수행 이력 — 고객사명·심사 결과·일정·담당자 등은 넣지 말고 본인 역할과 연도만 작성하세요.
+# category: 필수 | 의무 | 공공 | 금융 | 글로벌
+- name: 전사 정보보호 점검(내부감사)
+  category: 필수
+  role: 점검 수행
+  years: [2022, 2023, 2024, 2025]
 - name: ISMS-P
-  category: 국내
+  category: 의무
   role: 인증 총괄
   years: [2021, 2022, 2023, 2024, 2025]
+- name: 주요정보통신기반시설 보호대책
+  category: 의무
+  role: 이행 점검 대응
+  years: [2023, 2024, 2025]
 - name: CSAP (IaaS)
-  category: 국내
+  category: 공공
   role: 인증 총괄
   years: [2021, 2022, 2023, 2024, 2025]
 - name: CSAP (SaaS·DaaS)
-  category: 국내
+  category: 공공
   role: 인증 지원
   years: [2023, 2024, 2025]
-- name: ISO/IEC 27001·27017·27018
-  category: 국제
-  role: 통합 운영
-  years: [2021, 2022, 2023, 2024, 2025]
-- name: ISO/IEC 27701
-  category: 국제
-  role: 최초 취득 리딩
-  years: [2023, 2024, 2025]
-- name: ISO 22301
-  category: 국제
-  role: 운영
-  years: [2024, 2025]
-- name: CSA STAR
-  category: 국제
-  role: 운영
-  years: [2022, 2023, 2024, 2025]
 - name: 금융 CSP 안전성평가
   category: 금융
   role: 대응 총괄
+  years: [2022, 2023, 2024, 2025]
+- name: ISO/IEC 27001·27017·27018
+  category: 글로벌
+  role: 통합 운영
+  years: [2021, 2022, 2023, 2024, 2025]
+- name: ISO/IEC 27701
+  category: 글로벌
+  role: 최초 취득 리딩
+  years: [2023, 2024, 2025]
+- name: ISO 22301
+  category: 글로벌
+  role: 운영
+  years: [2024, 2025]
+- name: CSA STAR
+  category: 글로벌
+  role: 운영
   years: [2022, 2023, 2024, 2025]

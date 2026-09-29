@@ -1,25 +1,72 @@
 ---
 import '../styles/global.css';
-import { profile, career, certifications, audits, projects, formatYm } from '../lib/data';
+import {
+  profile,
+  career,
+  certifications,
+  audits,
+  projects,
+  formatYm,
+  ymToYear,
+  categories,
+  categoryKey,
+  yearRuns,
+} from '../lib/data';
 
-// 인증 수행 매트릭스의 연도 열 (데이터에 등장하는 연도 범위)
-const allYears = audits.flatMap((a) => a.years);
-const years =
-  allYears.length > 0
-    ? Array.from(
-        { length: Math.max(...allYears) - Math.min(...allYears) + 1 },
-        (_, i) => Math.min(...allYears) + i,
-      )
-    : [];
+const now = new Date();
+const thisYear = now.getFullYear();
+const pct = (v: number) => `${(v * 100).toFixed(3)}%`;
+
+// ── 경력 타임라인 축 (첫 입사 연도 ~ 올해 말)
+const careerStart = Math.floor(Math.min(...career.map((c) => ymToYear(c.start))));
+const careerEnd = thisYear + 1;
+const careerSpan = careerEnd - careerStart;
+const careerStep = careerSpan > 12 ? 5 : careerSpan > 6 ? 2 : 1;
+// 축 끝(올해 말)은 라벨 없이 두고, 시작 연도부터 step 간격으로만 표시
+const careerTicks = Array.from({ length: careerSpan }, (_, i) => careerStart + i).filter(
+  (y) => (y - careerStart) % careerStep === 0,
+);
+const careerBars = [...career]
+  .sort((a, b) => ymToYear(a.start) - ymToYear(b.start))
+  .map((c) => {
+    const s = ymToYear(c.start);
+    const e = ymToYear(c.end);
+    return { ...c, left: (s - careerStart) / careerSpan, width: (e - s) / careerSpan };
+  });
+
+// ── 인증 수행 축 (데이터의 최소~최대 연도)
+const auditYearsAll = audits.flatMap((a) => a.years);
+const auditMin = Math.min(...auditYearsAll);
+const auditMax = Math.max(...auditYearsAll);
+const auditYears = Array.from({ length: auditMax - auditMin + 1 }, (_, i) => auditMin + i);
+const auditSpan = auditYears.length;
+const auditGroups = categories
+  .map((cat) => ({ ...cat, items: audits.filter((a) => a.category === cat.name) }))
+  .filter((g) => g.items.length > 0);
+
+// ── KPI (경력·인증·자격증은 데이터에서 자동 계산)
+const careerYears = Math.floor(thisYear + now.getMonth() / 12 - Math.min(...career.map((c) => ymToYear(c.start))));
+const stats = [
+  { value: `${careerYears}년`, label: '경력' },
+  ...(profile.highlights ?? []),
+  { value: `${audits.length}종`, label: '수행 인증' },
+  { value: `${certifications.length}개`, label: '보유 자격증' },
+];
 
 const sections = [
+  { id: 'about', label: '소개' },
   { id: 'career', label: '경력' },
+  { id: 'audits', label: '인증 전문 영역' },
   { id: 'certifications', label: '자격증' },
-  { id: 'audits', label: '인증 수행' },
   { id: 'projects', label: '프로젝트' },
-  { id: 'contact', label: '연락처' },
 ];
-const updated = new Date().toISOString().slice(0, 10);
+const initials = (profile.name_en ?? profile.name)
+  .split(/\s+/)
+  .map((w) => w[0])
+  .join('')
+  .slice(0, 2)
+  .toUpperCase();
+const updated = now.toISOString().slice(0, 10);
 ---
 <!doctype html>
 <html lang="ko">
@@ -33,125 +80,203 @@ const updated = new Date().toISOString().slice(0, 10);
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
+    <script is:inline>
+      // 기본은 다크. 사용자가 고른 테마만 기억한다.
+      try {
+        if (localStorage.getItem('theme') === 'light') document.documentElement.dataset.theme = 'light';
+      } catch (e) {}
+    </script>
   </head>
   <body>
-    <nav class="nav">
-      <div class="container">
-        <a class="brand" href="#top">{profile.name}</a>
-        <ul>
-          {sections.map((s) => <li><a href={`#${s.id}`}>{s.label}</a></li>)}
-        </ul>
-      </div>
-    </nav>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="profile">
+          <div class="avatar" aria-hidden="true">{initials}</div>
+          <p class="org">{profile.organization}</p>
+          <h1>{profile.name}</h1>
+          {profile.name_en && <p class="name-en">{profile.name_en}</p>}
+          <p class="role">{profile.title}</p>
+        </div>
 
-    <main class="container" id="top">
-      <header class="hero">
-        <p class="eyebrow">{profile.organization}</p>
-        <h1>
-          {profile.title}, {profile.name}
-          {profile.name_en && <small>{profile.name_en}</small>}
-        </h1>
-        <p class="summary">{profile.summary}</p>
-        {profile.highlights && (
-          <div class="stats">
-            {profile.highlights.map((h) => (
-              <div class="stat">
-                <div class="value">{h.value}</div>
-                <div class="label">{h.label}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </header>
-
-      <section class="block" id="career">
-        <h2>경력</h2>
-        <ol class="timeline">
-          {career.map((c) => (
-            <li class="card">
-              <div class="head">
-                <h3>{c.company}</h3>
-                <span class="meta">{formatYm(c.start)} – {formatYm(c.end)}</span>
-              </div>
-              <div class="meta">{[c.team, c.role].filter(Boolean).join(' · ')}</div>
-              {c.duties && <ul>{c.duties.map((d) => <li>{d}</li>)}</ul>}
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section class="block" id="certifications">
-        <h2>보유 자격증</h2>
-        <div class="grid">
-          {certifications.map((c) => (
-            <div class="card cert">
-              <h3>{c.name}</h3>
-              <p>{c.issuer} · {formatYm(c.acquired)}</p>
+        <div class="kpis">
+          {stats.map((s) => (
+            <div class="kpi">
+              <div class="value">{s.value}</div>
+              <div class="label">{s.label}</div>
             </div>
           ))}
         </div>
-      </section>
 
-      <section class="block" id="audits">
-        <h2>인증 수행 이력</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>인증</th>
-                <th>구분</th>
-                <th>역할</th>
-                {years.map((y) => <th class="year">{y}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {audits.map((a) => (
-                <tr>
-                  <td><strong>{a.name}</strong></td>
-                  <td><span class="badge">{a.category}</span></td>
-                  <td>{a.role}</td>
-                  {years.map((y) => (
-                    <td class="year">
-                      {a.years.includes(y) ? <span class="dot" title={`${y}년 수행`}></span> : ''}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <nav class="toc" aria-label="섹션">
+          {sections.map((s) => <a href={`#${s.id}`} data-section={s.id}>{s.label}</a>)}
+        </nav>
+
+        <div class="side-foot">
+          <div class="links">
+            {profile.links?.email && <a href={`mailto:${profile.links.email}`}>Email</a>}
+            {profile.links?.linkedin && <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>}
+            {profile.links?.github && <a href={profile.links.github} target="_blank" rel="noopener noreferrer">GitHub</a>}
+          </div>
+          <button class="theme-toggle" type="button" aria-label="라이트/다크 테마 전환">
+            <span class="to-light">☀ 라이트</span><span class="to-dark">☾ 다크</span>
+          </button>
         </div>
-        <p class="note">● 표시는 해당 연도에 인증 취득·사후·갱신 심사를 수행했음을 뜻합니다.</p>
-      </section>
+      </aside>
 
-      <section class="block" id="projects">
-        <h2>주요 프로젝트</h2>
-        <div class="projects">
-          {projects.map((p) => (
-            <article class="card project">
-              <div class="head">
-                <h3>{p.title}</h3>
-                <span class="period">{p.period}</span>
+      <main>
+        <section class="panel" id="about">
+          <h2>소개</h2>
+          <p class="summary">{profile.summary}</p>
+        </section>
+
+        <section class="panel" id="career">
+          <div class="panel-head">
+            <h2>경력 타임라인</h2>
+            <span class="sub">{careerStart} – 현재</span>
+          </div>
+          <div class="gantt">
+            <div class="gantt-row axis">
+              <div class="gantt-label"></div>
+              <div class="gantt-track">
+                {careerTicks.map((y) => (
+                  <span class="tick" style={`left:${pct((y - careerStart) / careerSpan)}`}>{y}</span>
+                ))}
               </div>
-              <p>{p.description}</p>
-              {p.outcomes && <ul>{p.outcomes.map((o) => <li>{o}</li>)}</ul>}
-              {p.tags && <div class="tags">{p.tags.map((t) => <span class="badge">{t}</span>)}</div>}
-            </article>
-          ))}
-        </div>
-      </section>
+            </div>
+            {careerBars.map((c) => (
+              <div class="gantt-row">
+                <div class="gantt-label">
+                  <strong>{c.company}</strong>
+                  <span>{c.role}</span>
+                </div>
+                <div class="gantt-track grid-lines" style={`--cols:${careerSpan}`}>
+                  <span
+                    class:list={['bar', 'bar-career', { current: !c.end }]}
+                    style={`left:${pct(c.left)};width:${pct(c.width)}`}
+                    title={`${formatYm(c.start)} – ${formatYm(c.end)}`}
+                  ></span>
+                </div>
+              </div>
+            ))}
+          </div>
 
-      <section class="block" id="contact">
-        <h2>연락처</h2>
-        <div class="contact">
-          {profile.links?.email && <a href={`mailto:${profile.links.email}`}>✉ {profile.links.email}</a>}
-          {profile.links?.linkedin && <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>}
-          {profile.links?.github && <a href={profile.links.github} target="_blank" rel="noopener noreferrer">GitHub</a>}
-        </div>
-      </section>
-    </main>
+          <ol class="career-list">
+            {career.map((c) => (
+              <li>
+                <div class="head">
+                  <h3>{c.company}<span>{[c.team, c.role].filter(Boolean).join(' · ')}</span></h3>
+                  <span class="period">{formatYm(c.start)} – {formatYm(c.end)}</span>
+                </div>
+                {c.duties && <ul>{c.duties.map((d) => <li>{d}</li>)}</ul>}
+              </li>
+            ))}
+          </ol>
+        </section>
 
-    <footer>
-      <div class="container">© {new Date().getFullYear()} {profile.name} · 최종 업데이트 {updated}</div>
-    </footer>
+        <section class="panel" id="audits">
+          <div class="panel-head">
+            <h2>인증 전문 영역</h2>
+            <span class="sub">{auditMin} – {auditMax} 수행 연도</span>
+          </div>
+          <div class="legend">
+            {auditGroups.map((g) => (
+              <span class={`chip cat-${g.key}`}><i></i>{g.name} <b>{g.items.length}</b></span>
+            ))}
+          </div>
+
+          <div class="gantt">
+            <div class="gantt-row axis">
+              <div class="gantt-label"></div>
+              <div class="gantt-track years" style={`--cols:${auditSpan}`}>
+                {auditYears.map((y) => <span>{y}</span>)}
+              </div>
+            </div>
+            {auditGroups.map((g) => (
+              <>
+                <div class={`gantt-group cat-${g.key}`}>{g.name}</div>
+                {g.items.map((a) => (
+                  <div class="gantt-row">
+                    <div class="gantt-label">
+                      <strong>{a.name}</strong>
+                      <span>{a.role}</span>
+                    </div>
+                    <div class="gantt-track grid-lines" style={`--cols:${auditSpan}`}>
+                      {yearRuns(a.years).map(([s, e]) => (
+                        <span
+                          class={`bar cat-${categoryKey(a.category)}`}
+                          style={`left:${pct((s - auditMin) / auditSpan)};width:${pct((e - s + 1) / auditSpan)}`}
+                          title={s === e ? `${s}` : `${s} – ${e}`}
+                        >{e - s + 1}년</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
+            ))}
+          </div>
+        </section>
+
+        <section class="panel" id="certifications">
+          <h2>보유 자격증</h2>
+          <div class="cards">
+            {certifications.map((c) => (
+              <div class="card">
+                <h3>{c.name}</h3>
+                <p>{c.issuer}</p>
+                <p class="date">{formatYm(c.acquired)}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section class="panel" id="projects">
+          <h2>주요 프로젝트</h2>
+          <div class="projects">
+            {projects.map((p) => (
+              <article class="card project">
+                <div class="head">
+                  <h3>{p.title}</h3>
+                  <span class="period">{p.period}</span>
+                </div>
+                <p>{p.description}</p>
+                {p.outcomes && <ul>{p.outcomes.map((o) => <li>{o}</li>)}</ul>}
+                {p.tags && <div class="tags">{p.tags.map((t) => <span class="tag">{t}</span>)}</div>}
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <footer>© {thisYear} {profile.name} · 최종 업데이트 {updated}</footer>
+      </main>
+    </div>
+
+    <script is:inline>
+      // 테마 전환
+      document.querySelector('.theme-toggle').addEventListener('click', () => {
+        const root = document.documentElement;
+        const light = root.dataset.theme !== 'light';
+        if (light) root.dataset.theme = 'light';
+        else delete root.dataset.theme;
+        try {
+          localStorage.setItem('theme', light ? 'light' : 'dark');
+        } catch (e) {}
+      });
+
+      // 현재 보고 있는 섹션을 목차에 표시
+      const links = new Map(
+        [...document.querySelectorAll('.toc a')].map((a) => [a.dataset.section, a]),
+      );
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (!e.isIntersecting) continue;
+            links.forEach((a) => a.classList.remove('active'));
+            links.get(e.target.id)?.classList.add('active');
+          }
+        },
+        { rootMargin: '-30% 0px -60% 0px' },
+      );
+      document.querySelectorAll('main section[id]').forEach((s) => io.observe(s));
+    </script>
   </body>
 </html>

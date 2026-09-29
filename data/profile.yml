@@ -7,13 +7,10 @@ summary: >-
   15년간 클라우드·금융 분야 정보보호 인증을 수행해 온 보안 인증 매니저입니다.
   ISMS-P, CSAP, ISO 27000 계열 등 연간 약 20건의 인증을 관리하며,
   인증 요구사항을 실제 운영 통제로 연결하는 일을 합니다.
+# 경력 연수·인증 종류·자격증 수는 data 파일에서 자동 계산됩니다. 그 외 지표만 적으세요.
 highlights:
-  - label: 경력
-    value: "15년"
   - label: 연간 관리 인증
     value: "약 20건"
-  - label: 보유 자격증
-    value: "5개"
 links:
   email: example@example.com
   linkedin: https://www.linkedin.com/in/example
