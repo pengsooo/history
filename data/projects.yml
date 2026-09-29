@@ -1,0 +1,23 @@
+# 주요 프로젝트·성과 — 수치는 공개 가능한 범위에서만
+- title: 다중 인증 통합 증적관리 체계 구축
+  period: 2023
+  description: >-
+    ISMS-P·CSAP·ISO 인증 기준을 통제 항목 단위로 매핑해 중복 증적을 통합했습니다.
+  outcomes:
+    - 인증별 중복 증적 제출 약 40% 감소 (샘플 수치)
+    - 연간 심사 대응 일정 표준화
+  tags: [ISMS-P, CSAP, ISO 27001]
+- title: ISO/IEC 27701 최초 인증 취득
+  period: 2023
+  description: >-
+    개인정보 관리체계(PIMS) 확장 요구사항을 기존 ISMS에 통합해 최초 인증을 취득했습니다.
+  outcomes:
+    - 무결함 최초 인증 취득 (샘플)
+  tags: [ISO 27701, 개인정보]
+- title: 금융 CSP 안전성평가 대응 프로세스 정립
+  period: 2022
+  description: >-
+    금융권 클라우드 이용 가이드 기반 평가 항목에 대한 대응 체계를 만들었습니다.
+  outcomes:
+    - 평가 대응 기간 단축 (샘플)
+  tags: [금융, 클라우드]

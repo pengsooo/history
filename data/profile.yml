@@ -1,0 +1,20 @@
+# 기본 정보 — 공개 사이트이므로 휴대폰 번호·상세 주소는 넣지 마세요.
+name: 홍길동
+name_en: Gildong Hong
+title: 정보보호 인증 전문가
+organization: KT Cloud 보안인증진단팀
+summary: >-
+  15년간 클라우드·금융 분야 정보보호 인증을 수행해 온 보안 인증 매니저입니다.
+  ISMS-P, CSAP, ISO 27000 계열 등 연간 약 20건의 인증을 관리하며,
+  인증 요구사항을 실제 운영 통제로 연결하는 일을 합니다.
+highlights:
+  - label: 경력
+    value: "15년"
+  - label: 연간 관리 인증
+    value: "약 20건"
+  - label: 보유 자격증
+    value: "5개"
+links:
+  email: example@example.com
+  linkedin: https://www.linkedin.com/in/example
+  github: https://github.com/pengsooo

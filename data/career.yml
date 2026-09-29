@@ -1,0 +1,25 @@
+# 최신순으로 작성하세요. end가 비어 있으면 "현재"로 표시됩니다.
+- company: KT Cloud
+  team: 보안인증진단팀
+  role: 매니저
+  start: 2021-01
+  end:
+  duties:
+    - ISMS-P, CSAP(IaaS/DaaS/SaaS) 인증 취득 및 사후·갱신 심사 총괄
+    - ISO 27001/27017/27018/27701/22301 통합 인증 운영
+    - 금융 CSP 안전성평가 대응 및 증적 관리 체계 수립
+- company: 샘플 주식회사
+  team: 정보보호팀
+  role: 책임
+  start: 2015-03
+  end: 2020-12
+  duties:
+    - ISMS 최초 인증 취득 프로젝트 리딩
+    - 보안 정책·지침 체계 재정비
+- company: 샘플 컨설팅
+  team: 보안컨설팅본부
+  role: 컨설턴트
+  start: 2011-01
+  end: 2015-02
+  duties:
+    - 금융·공공기관 대상 관리체계 컨설팅 및 취약점 진단

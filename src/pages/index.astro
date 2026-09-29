@@ -1,0 +1,157 @@
+---
+import '../styles/global.css';
+import { profile, career, certifications, audits, projects, formatYm } from '../lib/data';
+
+// 인증 수행 매트릭스의 연도 열 (데이터에 등장하는 연도 범위)
+const allYears = audits.flatMap((a) => a.years);
+const years =
+  allYears.length > 0
+    ? Array.from(
+        { length: Math.max(...allYears) - Math.min(...allYears) + 1 },
+        (_, i) => Math.min(...allYears) + i,
+      )
+    : [];
+
+const sections = [
+  { id: 'career', label: '경력' },
+  { id: 'certifications', label: '자격증' },
+  { id: 'audits', label: '인증 수행' },
+  { id: 'projects', label: '프로젝트' },
+  { id: 'contact', label: '연락처' },
+];
+const updated = new Date().toISOString().slice(0, 10);
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{profile.name} | {profile.title}</title>
+    <meta name="description" content={profile.summary} />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.svg`} type="image/svg+xml" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="container">
+        <a class="brand" href="#top">{profile.name}</a>
+        <ul>
+          {sections.map((s) => <li><a href={`#${s.id}`}>{s.label}</a></li>)}
+        </ul>
+      </div>
+    </nav>
+
+    <main class="container" id="top">
+      <header class="hero">
+        <p class="eyebrow">{profile.organization}</p>
+        <h1>
+          {profile.title}, {profile.name}
+          {profile.name_en && <small>{profile.name_en}</small>}
+        </h1>
+        <p class="summary">{profile.summary}</p>
+        {profile.highlights && (
+          <div class="stats">
+            {profile.highlights.map((h) => (
+              <div class="stat">
+                <div class="value">{h.value}</div>
+                <div class="label">{h.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <section class="block" id="career">
+        <h2>경력</h2>
+        <ol class="timeline">
+          {career.map((c) => (
+            <li class="card">
+              <div class="head">
+                <h3>{c.company}</h3>
+                <span class="meta">{formatYm(c.start)} – {formatYm(c.end)}</span>
+              </div>
+              <div class="meta">{[c.team, c.role].filter(Boolean).join(' · ')}</div>
+              {c.duties && <ul>{c.duties.map((d) => <li>{d}</li>)}</ul>}
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="block" id="certifications">
+        <h2>보유 자격증</h2>
+        <div class="grid">
+          {certifications.map((c) => (
+            <div class="card cert">
+              <h3>{c.name}</h3>
+              <p>{c.issuer} · {formatYm(c.acquired)}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="block" id="audits">
+        <h2>인증 수행 이력</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>인증</th>
+                <th>구분</th>
+                <th>역할</th>
+                {years.map((y) => <th class="year">{y}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {audits.map((a) => (
+                <tr>
+                  <td><strong>{a.name}</strong></td>
+                  <td><span class="badge">{a.category}</span></td>
+                  <td>{a.role}</td>
+                  {years.map((y) => (
+                    <td class="year">
+                      {a.years.includes(y) ? <span class="dot" title={`${y}년 수행`}></span> : ''}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="note">● 표시는 해당 연도에 인증 취득·사후·갱신 심사를 수행했음을 뜻합니다.</p>
+      </section>
+
+      <section class="block" id="projects">
+        <h2>주요 프로젝트</h2>
+        <div class="projects">
+          {projects.map((p) => (
+            <article class="card project">
+              <div class="head">
+                <h3>{p.title}</h3>
+                <span class="period">{p.period}</span>
+              </div>
+              <p>{p.description}</p>
+              {p.outcomes && <ul>{p.outcomes.map((o) => <li>{o}</li>)}</ul>}
+              {p.tags && <div class="tags">{p.tags.map((t) => <span class="badge">{t}</span>)}</div>}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="block" id="contact">
+        <h2>연락처</h2>
+        <div class="contact">
+          {profile.links?.email && <a href={`mailto:${profile.links.email}`}>✉ {profile.links.email}</a>}
+          {profile.links?.linkedin && <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>}
+          {profile.links?.github && <a href={profile.links.github} target="_blank" rel="noopener noreferrer">GitHub</a>}
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">© {new Date().getFullYear()} {profile.name} · 최종 업데이트 {updated}</div>
+    </footer>
+  </body>
+</html>

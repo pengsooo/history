@@ -1,0 +1,16 @@
+# 보유 자격증 — 취득 연월 기준 최신순
+- name: CISA
+  issuer: ISACA
+  acquired: 2019-06
+- name: CISSP
+  issuer: (ISC)²
+  acquired: 2017-11
+- name: ISMS-P 인증심사원
+  issuer: 한국인터넷진흥원(KISA)
+  acquired: 2016-09
+- name: ISO/IEC 27001 Lead Auditor
+  issuer: 샘플 교육기관
+  acquired: 2014-04
+- name: 정보보안기사
+  issuer: 한국인터넷진흥원(KISA)
+  acquired: 2013-12
